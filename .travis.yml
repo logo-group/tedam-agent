@@ -10,7 +10,7 @@ before_install:
   - npm install -g newman
   - git clone https://github.com/logobs/tedam-rest.git
   - cd tedam-rest && mvn clean install -DskipTests && cd ..
-  - git clone https://github.com/canberkizgi/tedam-core.git
+  - git clone https://github.com/logobs/tedam-core.git
   - cd tedam-core && mvn clean install -DskipTests && cd ..
 script:
   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -DskipTests
