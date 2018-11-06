@@ -1,0 +1,16 @@
+dist: trusty
+language: java
+sudo: false
+addons:
+  sonarcloud:
+    organization: "logobusinesssolutions-github"
+    token:
+      secure: "H+rQ1GYPPdCBUKlhDTAdQTbGdJZigsVHLsoEtIJhwyz2EARrAMBac0y/7JX96RuP1eOrpVoGKGsVfeWRUPB+RQcmhLABWqsvlXXg9X2Vctwu+gxMMpt+dTqSZo9FcUVwrAdQi3hcrjBIsWpo/9Gntfi02XZmLHVf+JWiHB4XArjuWEd8KOs+swFT1SD6/z8PdhCb8iH/iK0BJ/bsyLPZgrcvupWPvwpM0OwvaVCy6Pv+RG3CSc4/AZcw6mxoBIZ/GZRnyFZ/Kc+DrVH4/RjMHNeUQeEnXVNerB7y8HVvfBePBRGWHSdZBP8FgSwzyhIS9l0Y5E/r6ocnAGk5y0y1hozyZE3/+ziq6wPo9EgjbUBqf8LAyYmQFrSAhATGvK4uX06wn97DQAJHXMqgcVAmpljpobpUlujm/kLSB8koMg8EDrrXZsvXWfFIZaB4P7yb37X2M4IWWsPc8RHeVf2CRAdsfVTil+kUfn9BHbn/M7ZpeB4rXBk6dJikzvu9VJruioe7ZeWCei+2lnj06mMysoQ+U1EtnAshg7S1tYjPrMhNoM5MueUXEw6T1Qd/3wZBvOL9M5iyN3wrgxrh7KfZr7K2LpN93Fl4o6zb5A/x63B9mCwcmBDRTXddH9WGXsfhoodcSPKpkkWbYKzLSrxaM+mDV5A6agMj3+38eDK9IpA="
+before_install:
+  - npm install -g newman
+  - git clone https://github.com/logobs/tedam-rest.git
+  - cd tedam-rest && mvn clean install -DskipTests && cd ..
+  - git clone https://github.com/canberkizgi/tedam-core.git
+  - cd tedam-core && mvn clean install -DskipTests && cd ..
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -DskipTests
