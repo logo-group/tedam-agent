@@ -1,4 +1,4 @@
-# TEDAM-Manager
+# TEDAM-Agent
 <a href="http://www.logo.com.tr"><img src="https://www.logo.com.tr/img/logo.png"/></a>
 
 [![Build Status](https://travis-ci.com/logobs/tedam-agent.svg?branch=master)](https://travis-ci.com/logobs/tedam-agent)
