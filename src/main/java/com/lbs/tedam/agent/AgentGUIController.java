@@ -143,6 +143,10 @@ public class AgentGUIController implements HasLogger {
 		return clientName;
 	}
 
+	public String getProjectName() {
+		return PropUtils.getProperty(Constants.CLIENT_PROJECT_NAME);
+	}
+
 	/**
 	 * this method setClientName <br>
 	 * @author Canberk.Erkmen

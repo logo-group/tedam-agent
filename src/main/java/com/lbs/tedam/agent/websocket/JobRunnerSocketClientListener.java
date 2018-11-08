@@ -65,7 +65,8 @@ public class JobRunnerSocketClientListener implements WebSocketClientListener, H
 		if (executor.getActiveCount() > 0) {
 			clientStatus = ClientStatus.BUSY;
 		}
-		ClientMessage clientMessage = new ClientMessage(controller.getClientName(), clientStatus);
+		ClientMessage clientMessage = new ClientMessage(controller.getClientName(), controller.getProjectName(),
+				clientStatus);
 		TedamSocketMessage tedamSocketMessage = new TedamSocketMessage(TedamJsonFactory.toJson(clientMessage), TedamSocketMessageType.CLIENT);
 		return tedamSocketMessage;
 	}
