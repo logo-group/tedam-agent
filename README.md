@@ -10,16 +10,6 @@
 [sonar-vulnerabilities]: https://sonarcloud.io/api/project_badges/measure?project=com.lbs.tedam%3ATEDAMAgent&metric=vulnerabilities
 [sonar-dublicated-lines]: https://sonarcloud.io/api/project_badges/measure?project=com.lbs.tedam%3ATEDAMAgent&metric=duplicated_lines_density
 
-Before running TedamAgent project; you should define logfilePath first. 
+When the TedamAgent is running, it is the client endpoints that communicate through the WebSocket and are ready to run the job as long as the application is standing up and sending heartbeats to Tedam Manager.
 
-To do this: (for eclipse)
-	  
-	  Right Click AgentGUIController
-	  
-	  Click Run As -> Run Configurations
-	  
-	  Go Arguments tab
-	  
-	  Write: -DlogFilePath=D:/ to VM arguments field. (You can change D path) and apply
-
-Then Right Click “config” folder -> Build Path -> Use folder as source
+There is no operation that they do on their own. They execute received commands.
