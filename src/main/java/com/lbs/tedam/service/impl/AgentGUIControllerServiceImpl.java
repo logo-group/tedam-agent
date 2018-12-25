@@ -28,7 +28,6 @@ import com.lbs.tedam.model.JobRunnerDetailCommand;
 import com.lbs.tedam.model.TedamSocketMessage;
 import com.lbs.tedam.model.DTO.LogoTestResult;
 import com.lbs.tedam.service.AgentGUIControllerService;
-import com.lbs.tedam.util.Constants;
 import com.lbs.tedam.util.EnumsV2.CommandStatus;
 import com.lbs.tedam.util.EnumsV2.ExecutionStatus;
 import com.lbs.tedam.util.EnumsV2.RunOrder;
@@ -42,7 +41,8 @@ import com.lbs.tedam.util.TedamStringUtils;
 public class AgentGUIControllerServiceImpl implements AgentGUIControllerService, HasLogger {
 
 	@Override
-	public void startJobCommandListOperations(JobRunnerCommand jobRunnerCommand, JobRunnerSocketClientListener jobRunnerSocketClientListener) {
+	public void startJobCommandListOperations(JobRunnerCommand jobRunnerCommand,
+			JobRunnerSocketClientListener jobRunnerSocketClientListener) {
 		appendTextAreaContent("TestSetId : " + jobRunnerCommand.getTestSetId() + " started.");
 
 		for (JobRunnerDetailCommand jobRunnerDetailCommand : jobRunnerCommand.getJobRunnerDetailCommandList()) {
@@ -50,13 +50,15 @@ public class AgentGUIControllerServiceImpl implements AgentGUIControllerService,
 			String command = getCommand(jobRunnerDetailCommand);
 			getLogger().info("command : " + command);
 
-			appendTextAreaContent("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId() + " for  " + jobRunnerDetailCommand.getDraftCommandName() + " command status : "
+			appendTextAreaContent("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId() + " for  "
+					+ jobRunnerDetailCommand.getDraftCommandName() + " command status : "
 					+ CommandStatus.IN_PROGRESS.getValue());
 
 			jobRunnerDetailCommand.setCommandStatus(CommandStatus.IN_PROGRESS);
 			sendJobRunnerDetailCommand(jobRunnerSocketClientListener, jobRunnerDetailCommand);
 
-			String testResultReportPath = TedamStringUtils.getTestResultReportPath(jobRunnerCommand.getTestSetId(), jobRunnerDetailCommand.getTestCaseId(),
+			String testResultReportPath = TedamStringUtils.getTestResultReportPath(jobRunnerCommand.getTestSetId(),
+					jobRunnerDetailCommand.getTestCaseId(),
 					jobRunnerDetailCommand.getRunOrder() == RunOrder.CREATE_SCRIPT ? true : false);
 			getLogger().info("testResultReportPath : " + testResultReportPath);
 
@@ -66,7 +68,8 @@ public class AgentGUIControllerServiceImpl implements AgentGUIControllerService,
 			LocalDateTime startDate = LocalDateTime.now();
 			getLogger().info("startDate : " + startDate);
 
-			boolean isCommandSucces = TedamProcessUtils.launchCommand(command, TedamProcessUtils.getClassPath(AgentGUIController.class),
+			boolean isCommandSucces = TedamProcessUtils.launchCommand(command,
+					TedamProcessUtils.getClassPath(AgentGUIController.class),
 					jobRunnerDetailCommand.getLastExpectedResult());
 
 			getLogger().info("jobCommand calistirildi. isCommandSucces  : " + isCommandSucces);
@@ -74,10 +77,12 @@ public class AgentGUIControllerServiceImpl implements AgentGUIControllerService,
 			LocalDateTime endDate = LocalDateTime.now();
 			getLogger().info("endDate : " + endDate);
 
-			if (!isCommandSucces) {// it will enter here if it will be false if the command does not arrive at the desired line.
+			if (!isCommandSucces) {// it will enter here if it will be false if the command does not arrive at the
+									// desired line.
 									// According to the situation, the next testCase should be considered
 									// TODO:mikyas
-				appendTextAreaContent("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId() + " the command could not be completed as expected");
+				appendTextAreaContent("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId()
+						+ " the command could not be completed as expected");
 				jobRunnerDetailCommand.setExecutionStatus(ExecutionStatus.BLOCKED);
 				jobRunnerDetailCommand.setCommandStatus(CommandStatus.BLOCKED);
 				prepareTestRunStartAndEndDate(jobRunnerDetailCommand, startDate, endDate);
@@ -86,30 +91,37 @@ public class AgentGUIControllerServiceImpl implements AgentGUIControllerService,
 			}
 			boolean isTestResultFileExist = TedamFileUtils.isFileExist(testResultReportPath);
 			if (isTestResultFileExist) {
-				getLogger().info("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId() + " command finished as requested and the file was created.");
+				getLogger().info("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId()
+						+ " command finished as requested and the file was created.");
 				List<LogoTestResult> results = TedamFileUtils.readFromExcelFileTEDAM(excelFile.getPath());
 				jobRunnerDetailCommand.setTestResultList(results);
 				jobRunnerDetailCommand.setCommandStatus(CommandStatus.COMPLETED);
 			} else {
-				getLogger().info("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId() + " command finished as desired, but the result control file was not found.");
+				getLogger().info("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId()
+						+ " command finished as desired, but the result control file was not found.");
 				jobRunnerDetailCommand.setExecutionStatus(ExecutionStatus.BLOCKED);
 				jobRunnerDetailCommand.setCommandStatus(CommandStatus.BLOCKED);
 			}
 			prepareTestRunStartAndEndDate(jobRunnerDetailCommand, startDate, endDate);
-			appendTextAreaContent("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId() + " for commandStatus : " + CommandStatus.COMPLETED.getValue());
+			appendTextAreaContent("TestCaseId : " + jobRunnerDetailCommand.getTestCaseId() + " for commandStatus : "
+					+ CommandStatus.COMPLETED.getValue());
 			sendJobRunnerDetailCommand(jobRunnerSocketClientListener, jobRunnerDetailCommand);
 
 		}
 		appendTextAreaContent("TestSetId : " + jobRunnerCommand.getTestSetId() + " it's over.");
 	}
 
-	private void prepareTestRunStartAndEndDate(JobRunnerDetailCommand jobRunnerDetailCommand, LocalDateTime startDate, LocalDateTime endDate) {
+	private void prepareTestRunStartAndEndDate(JobRunnerDetailCommand jobRunnerDetailCommand, LocalDateTime startDate,
+			LocalDateTime endDate) {
 		jobRunnerDetailCommand.setStartDate(startDate);
 		jobRunnerDetailCommand.setEndDate(endDate);
 	}
 
 	private String getCommand(JobRunnerDetailCommand jobRunnerDetailCommand) {
-		if (Constants.isWindows) {
+		String osName = System.getProperty("os.name");
+		String osNameLowerCase = osName.toLowerCase();
+		boolean isWindows = osNameLowerCase.contains("windows");
+		if (isWindows) {
 			return jobRunnerDetailCommand.getWindowsCommand();
 		} else {
 			return jobRunnerDetailCommand.getUnixCommand();
@@ -117,17 +129,19 @@ public class AgentGUIControllerServiceImpl implements AgentGUIControllerService,
 	}
 
 	/**
-	 * appendTextAreaContent CommandTextArea with this method is added to the system clock or content.<br>
+	 * appendTextAreaContent CommandTextArea with this method is added to the system
+	 * clock or content.<br>
+	 * 
 	 * @author Canberk.Erkmen
-	 * @param content
-	 *            <br>
+	 * @param content <br>
 	 */
 	private void appendTextAreaContent(String content) {
 		AgentGUIController.getAgentGUI().appendTextAreaContent(content);
 		getLogger().info(content);
 	}
 
-	private void sendJobRunnerDetailCommand(JobRunnerSocketClientListener jobRunnerSocketClientListener, JobRunnerDetailCommand jobRunnerDetailCommand) {
+	private void sendJobRunnerDetailCommand(JobRunnerSocketClientListener jobRunnerSocketClientListener,
+			JobRunnerDetailCommand jobRunnerDetailCommand) {
 		TedamSocketMessage tedamSocketMessage = new TedamSocketMessage();
 		tedamSocketMessage.setTedamSocketMessageType(TedamSocketMessageType.JOB);
 		tedamSocketMessage.setDetail(TedamJsonFactory.toJson(jobRunnerDetailCommand));
